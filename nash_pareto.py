@@ -100,6 +100,41 @@ def run_pure(payoff, test):
     return pure
 
 
+def get_mixed_nash(payoff):
+    a, b = payoff[0][0]
+    c, d = payoff[0][1]
+    e, f = payoff[1][0]
+    g, h = payoff[1][1]
+    p = 0
+    q = 0
+
+    q_den = (a - c) - (e - g)
+    p_den = (b - f) - (d - h)
+    if q_den == 0:
+        if c - g < 0:
+            p = 0
+        elif c - g > 0:
+            p = 1
+        else:
+            pass
+    else:
+        q = -(c - g) / q_den
+
+    if p_den == 0:
+        if f - h < 0:
+            q = 0
+        elif f - h:
+            q = 1
+        else:
+            pass
+    else:
+        p = -(f - h) / p_den
+
+    row_mixed = (Fraction(p).limit_denominator(), Fraction(1 - p).limit_denominator())
+    col_mixed = (Fraction(q).limit_denominator(), Fraction(1 - q).limit_denominator())
+    return [row_mixed, col_mixed]
+
+
 def main():
     (success, m, n) = parse_args(sys.argv)
     if not success:
@@ -113,6 +148,13 @@ def main():
         pure_pareto = run_pure(payoff, is_pareto_optimal)
         print("Pure Nash:", pure_nash)
         print("Pure Pareto:", pure_pareto)
+
+        if m == 2 and n == 2:
+            mixed_nash = get_mixed_nash(payoff)
+            row_mixed, col_mixed = mixed_nash
+            print("Mixed Nash:")
+            print("\tRow Strategy:\t\t({:>6}, {:>6})".format(format_frac(row_mixed[0]), format_frac(row_mixed[1])))
+            print("\tColumn Strategy:\t({:>6}, {:>6})".format(format_frac(col_mixed[0]), format_frac(col_mixed[1])))
     else:
         print("Invalid input!")
 
